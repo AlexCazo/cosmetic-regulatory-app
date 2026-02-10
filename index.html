@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Évaluation réglementaire – Démo</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 2rem; }
+    fieldset { margin-bottom: 1.5rem; }
+    .resultat { padding: 1rem; border: 1px solid #ccc; }
+    .non-conforme { color: red; font-weight: bold; }
+    .conforme { color: green; }
+  </style>
+</head>
+<body>
+
+<h1>Démo – Évaluation réglementaire cosmétique (UE)</h1>
+
+<!-- Bloc 1 : usages -->
+<fieldset>
+  <legend>Usages de la formule</legend>
+  <label><input type="checkbox" id="nonRince"> Produit non rincé</label><br>
+  <label><input type="checkbox" id="visage"> Usage visage</label><br>
+  <label><input type="checkbox" id="muqueuse"> Usage muqueuse</label>
+</fieldset>
+
+<!-- Bloc 2 : composition simplifiée -->
+<fieldset>
+  <legend>Composition de la formule</legend>
+  <p>Exemple préchargé (démo)</p>
+  <ul>
+    <li>Ingrédient A : 10 %</li>
+    <li>Ingrédient B : 5 %</li>
+  </ul>
+</fieldset>
+
+<button onclick="lancerEvaluation()">Évaluer la conformité</button>
+
+<!-- Bloc 3 : résultat -->
+<h2>Résultat</h2>
+<div id="resultat" class="resultat"></div>
+
+<script src="evaluationReglementaire.js"></script>
+<script src="ui.js"></script>
+
+</body>
+</html>
