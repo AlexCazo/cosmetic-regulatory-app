@@ -34,30 +34,40 @@ export function evaluateFormula(ingredients, zone, usages) {
 
   const issues = [];
 
-  ingredients.forEach(ingredient => {
-    const { name, concentration } = ingredient;
+  ingredients.forEach(({ name, concentration }) => {
+    const normalized = name.trim();
 
-    // Vérification ingrédient restreint
-    if (rules.restrictedIngredients.includes(name)) {
-      const max = rules.maxConcentration[name];
+    const rule = rules.ingredients?.[normalized];
 
-      if (max !== undefined && concentration > max) {
+    if (!rule) return;
+
+    // Vérification concentration
+    if (
+      rule.maxConcentration !== undefined &&
+      concentration > rule.maxConcentration
+    ) {
+      issues.push(
+        `${normalized} dépasse la concentration autorisée (${concentration}% > ${rule.maxConcentration}%)`
+      );
+    }
+
+    // Vérification usages
+    if (rule.allowedIn) {
+      const usageAllowed = usages.some(u =>
+        rule.allowedIn.includes(u)
+      );
+
+      if (!usageAllowed) {
         issues.push(
-          `${name} dépasse la concentration autorisée (${concentration}% > ${max}%)`
+          `${normalized} non autorisé pour les usages sélectionnés`
         );
       }
     }
   });
 
-  if (issues.length > 0) {
-    return {
-      compliant: false,
-      issues
-    };
-  }
-
-  return {
-    compliant: true,
-    message: "Formule conforme pour la zone sélectionnée"
-  };
+  return issues.length > 0
+    ? { compliant: false, issues }
+    : { compliant: true, message: "Formule conforme pour la zone sélectionnée" };
 }
+
+
