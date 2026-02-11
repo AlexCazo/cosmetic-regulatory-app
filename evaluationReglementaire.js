@@ -9,12 +9,27 @@
  */
 const REGULATORY_RULES = {
   UE: {
-    restrictedIngredients: ["Phenoxyethanol", "BHT"],
-    maxConcentration: {
-      Phenoxyethanol: 1.0
+    ingredients: {
+      Phenoxyethanol: {
+        limits: [
+          {
+            max: 1.0,
+            allowedUsages: ["rincé", "non rincé"]
+          }
+        ]
+      },
+      BHT: {
+        limits: [
+          {
+            max: 0.1,
+            allowedUsages: ["rincé"]
+          }
+        ]
+      }
     }
   }
 };
+
 
 /**
  * Évalue une formule
@@ -36,33 +51,28 @@ export function evaluateFormula(ingredients, zone, usages) {
 
   ingredients.forEach(({ name, concentration }) => {
     const normalized = name.trim();
+    const ingredientRule = rules.ingredients?.[normalized];
 
-    const rule = rules.ingredients?.[normalized];
+    if (!ingredientRule) return;
 
-    if (!rule) return;
-
-    // Vérification concentration
-    if (
-      rule.maxConcentration !== undefined &&
-      concentration > rule.maxConcentration
-    ) {
-      issues.push(
-        `${normalized} dépasse la concentration autorisée (${concentration}% > ${rule.maxConcentration}%)`
-      );
-    }
-
-    // Vérification usages
-    if (rule.allowedIn) {
-      const usageAllowed = usages.some(u =>
-        rule.allowedIn.includes(u)
+    ingredientRule.limits.forEach(limit => {
+      const allUsagesCovered = usages.every(u =>
+        limit.allowedUsages.includes(u)
       );
 
-      if (!usageAllowed) {
+      if (!allUsagesCovered) {
         issues.push(
-          `${normalized} non autorisé pour les usages sélectionnés`
+          `${normalized} non autorisé pour l’ensemble des usages sélectionnés`
+        );
+        return;
+      }
+
+      if (concentration > limit.max) {
+        issues.push(
+          `${normalized} dépasse la concentration autorisée (${concentration}% > ${limit.max}%)`
         );
       }
-    }
+    });
   });
 
   return issues.length > 0
