@@ -11,20 +11,15 @@ const REGULATORY_RULES = {
   UE: {
     ingredients: {
       Phenoxyethanol: {
-        limits: [
-          {
-            max: 1.0,
-            allowedUsages: ["rincé", "non rincé"]
-          }
-        ]
+        limitsByUsage: {
+          "rincé": 1.0,
+          "non rincé": 0.5
+        }
       },
       BHT: {
-        limits: [
-          {
-            max: 0.1,
-            allowedUsages: ["rincé"]
-          }
-        ]
+        limitsByUsage: {
+          "rincé": 0.1
+        }
       }
     }
   }
@@ -53,31 +48,30 @@ export function evaluateFormula(ingredients, zone, usages) {
     const normalized = name.trim();
     const ingredientRule = rules.ingredients?.[normalized];
 
+    // Si l’ingrédient n’est pas dans la base → hors périmètre de contrôle
     if (!ingredientRule) return;
 
-    ingredientRule.limits.forEach(limit => {
-      const allUsagesCovered = usages.every(u =>
-        limit.allowedUsages.includes(u)
+    const limitsByUsage = ingredientRule.limitsByUsage;
+
+    // On récupère uniquement les usages pour lesquels une limite existe
+    const applicableLimits = usages
+      .map(u => limitsByUsage[u])
+      .filter(limit => limit !== undefined);
+
+    // Si aucune limite définie pour ces usages → pas restreint
+    if (applicableLimits.length === 0) return;
+
+    // Sinon on applique la plus restrictive
+    const maxAllowed = Math.min(...applicableLimits);
+
+    if (concentration > maxAllowed) {
+      issues.push(
+        `${normalized} dépasse la limite autorisée (${concentration}% > ${maxAllowed}%)`
       );
-
-      if (!allUsagesCovered) {
-        issues.push(
-          `${normalized} non autorisé pour l’ensemble des usages sélectionnés`
-        );
-        return;
-      }
-
-      if (concentration > limit.max) {
-        issues.push(
-          `${normalized} dépasse la concentration autorisée (${concentration}% > ${limit.max}%)`
-        );
-      }
-    });
+    }
   });
 
   return issues.length > 0
     ? { compliant: false, issues }
     : { compliant: true, message: "Formule conforme pour la zone sélectionnée" };
 }
-
-
