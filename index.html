@@ -1,46 +1,37 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <title>Évaluation réglementaire – Démo</title>
-  <style>
-    body { font-family: Arial, sans-serif; margin: 2rem; }
-    fieldset { margin-bottom: 1.5rem; }
-    .resultat { padding: 1rem; border: 1px solid #ccc; }
-    .non-conforme { color: red; font-weight: bold; }
-    .conforme { color: green; }
-  </style>
+  <meta charset="UTF-8">
+  <title>Moteur réglementaire cosmétique</title>
 </head>
 <body>
 
-<h1>Démo – Évaluation réglementaire cosmétique (UE)</h1>
+  <h1>Évaluation réglementaire – Cosmétique</h1>
 
-<!-- Bloc 1 : usages -->
-<fieldset>
-  <legend>Usages de la formule</legend>
-  <label><input type="checkbox" id="nonRince"> Produit non rincé</label><br>
-  <label><input type="checkbox" id="visage"> Usage visage</label><br>
-  <label><input type="checkbox" id="muqueuse"> Usage muqueuse</label>
-</fieldset>
+  <label>
+    Ingrédient :
+    <input type="text" id="ingredientName" placeholder="Phenoxyethanol">
+  </label>
 
-<!-- Bloc 2 : composition simplifiée -->
-<fieldset>
-  <legend>Composition de la formule</legend>
-  <p>Exemple préchargé (démo)</p>
-  <ul>
-    <li>Ingrédient A : 10 %</li>
-    <li>Ingrédient B : 5 %</li>
-  </ul>
-</fieldset>
+  <label>
+    Concentration (%) :
+    <input type="number" id="concentration" step="0.01">
+  </label>
 
-<button onclick="lancerEvaluation()">Évaluer la conformité</button>
+  <label>
+    Usages :
+    <select id="usages" multiple>
+      <option value="rincé">Rincé</option>
+      <option value="non rincé">Non rincé</option>
+    </select>
+  </label>
 
-<!-- Bloc 3 : résultat -->
-<h2>Résultat</h2>
-<div id="resultat" class="resultat"></div>
+  <button id="evaluateBtn">Évaluer</button>
 
-<script src="evaluationReglementaire.js"></script>
-<script src="ui.js"></script>
+  <h2>Résultat :</h2>
+  <pre id="result"></pre>
+
+  <script type="module" src="ui.js"></script>
 
 </body>
 </html>
